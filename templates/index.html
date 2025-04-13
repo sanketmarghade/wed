@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Stock Analyzer</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <h1>TradingView Stock Analyzer</h1>
+  <input type="text" id="symbol" placeholder="Enter Stock Symbol (e.g., RELIANCE)">
+  <select id="interval">
+    <option value="1d">1 Day</option>
+    <option value="1h">1 Hour</option>
+    <option value="15m">15 Minutes</option>
+  </select>
+  <button onclick="analyze()">Analyze</button>
+
+  <div id="result"></div>
+
+  <script src="/static/script.js"></script>
+</body>
+</html>
