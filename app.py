@@ -16,33 +16,50 @@ interval_map = {
     "1mo": Interval.INTERVAL_1_MONTH,
 }
 
+@app.route('/')
+def home():
+    return jsonify({"status": "API running", "version": "1.0"})
+
 @app.route('/analyze', methods=['POST'])
 def analyze():
-    data = request.get_json()
-    symbol = data.get("symbol", "").upper()
-    interval = interval_map.get(data.get("interval", "1d"), Interval.INTERVAL_1_DAY)
-
     try:
+        data = request.get_json()
+        symbol = data.get("symbol", "").upper()
+        interval_str = data.get("interval", "1d")
+        exchange = data.get("exchange", "NSE")
+        screener = data.get("screener", "india")
+
+        if not symbol:
+            return jsonify({"error": "Symbol is required"}), 400
+        if interval_str not in interval_map:
+            return jsonify({"error": f"Unsupported interval: {interval_str}"}), 400
+
+        interval = interval_map[interval_str]
+
         handler = TA_Handler(
             symbol=symbol,
-            screener="india",
-            exchange="NSE",
+            screener=screener,
+            exchange=exchange,
             interval=interval
         )
+
         analysis = handler.get_analysis()
-        summary = analysis.summary
 
         return jsonify({
             "symbol": symbol,
-            "interval": data.get("interval", "1d"),
-            "recommendation": summary.get('RECOMMENDATION', "Not Available"),
-            "BUY": summary.get('BUY', 0),
-            "NEUTRAL": summary.get('NEUTRAL', 0),
-            "SELL": summary.get('SELL', 0),
-            "indicators": analysis.indicators
+            "exchange": exchange,
+            "screener": screener,
+            "interval": interval_str,
+            "summary": analysis.summary,
+            "indicators": analysis.indicators,
+            "oscillators": analysis.oscillators,
+            "moving_averages": analysis.moving_averages,
+            "time": analysis.time
         })
+
     except Exception as e:
-        return jsonify({"error": str(e)}), 400
+        print(f"Error: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
