@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from tradingview-ta-v2 import TA_Handler, Interval
+from tradingview_ta import TA_Handler, Interval
 
 app = Flask(__name__)
 CORS(app)
